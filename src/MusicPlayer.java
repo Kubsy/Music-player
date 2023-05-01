@@ -46,6 +46,7 @@ public class MusicPlayer extends JFrame implements ActionListener
         return (JButton) setupComponent(button, c);
     }
 
+    //TODO add action for the buttons.
     @Override
     public void actionPerformed(ActionEvent e)
     {
