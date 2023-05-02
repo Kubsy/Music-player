@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-enum states {READY, OPENED, PLAYING, PAUSED, EXIT};
+enum states {READY, OPENED, PLAYING, PAUSED, EXIT}
 
 public class MusicPlayer extends JFrame implements ActionListener
 {
