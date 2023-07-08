@@ -4,6 +4,5 @@ public class Main {
         MusicPlayer player = new MusicPlayer();
         player.setSize(600,400);
         player.setVisible(true);
-
     }
 }

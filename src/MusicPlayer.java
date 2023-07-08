@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 
 enum states {READY, OPENED, PLAYING, PAUSED, EXIT}
 
@@ -8,10 +9,14 @@ public class MusicPlayer extends JFrame implements ActionListener
 {
     private final byte OPEN = 0, PLAY = 1, PAUSE = 2, STOP = 3, CLOSE = 4, EXIT = 5;
     private final String[] BUTTON_LABELS = {"Open", "Play", "Pause", "Stop", "Close", "Exit"};
+    private boolean opened;
     private JButton[] actButtons;
     private JPanel p;
     private states state = states.READY;
     private JLabel Display;
+    private JFileChooser files;
+    private File file;
+    private AudioManager audioManager;
     private final int MAXWINDOWROW = 2;
     public MusicPlayer()
     {
@@ -30,6 +35,8 @@ public class MusicPlayer extends JFrame implements ActionListener
         {
             actButtons[i] = setupButton(""+BUTTON_LABELS[i], this, p);
         }
+
+        audioManager = new AudioManager();
 
         Display.setText("Ready");
         SetAllButtonsEnabled(false);
@@ -62,6 +69,15 @@ public class MusicPlayer extends JFrame implements ActionListener
 
     private void DoOpened()
     {
+        opened = OpenAudioFile();
+
+        if(!opened)
+        {
+            System.out.println("No file loaded, exiting.");
+            state = states.READY;
+            return;
+        }
+
         Display.setText("Opened");
         SetAllButtonsEnabled(false);
         actButtons[PLAY].setEnabled(true);
@@ -71,7 +87,8 @@ public class MusicPlayer extends JFrame implements ActionListener
 
     private void DoPlaying()
     {
-        Display.setText("Playing");
+        audioManager.PlayAudio(file);
+        Display.setText(file.getName());
         SetAllButtonsEnabled(false);
         actButtons[PAUSE].setEnabled(true);
         actButtons[STOP].setEnabled(true);
@@ -85,6 +102,30 @@ public class MusicPlayer extends JFrame implements ActionListener
         actButtons[PLAY].setEnabled(true);
         actButtons[EXIT].setEnabled(true);
         actButtons[STOP].setEnabled(true);
+    }
+
+    private void DoClosed()
+    {
+        Display.setText("Ready");
+        SetAllButtonsEnabled(false);
+        actButtons[OPEN].setEnabled(true);
+        actButtons[EXIT].setEnabled(true);
+        state = states.READY;
+    }
+
+    private Boolean OpenAudioFile()
+    {
+        files = new JFileChooser();
+
+        int response = files.showOpenDialog(this);
+
+        if (response==JFileChooser.APPROVE_OPTION)
+        {
+            file = files.getSelectedFile();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -110,12 +151,7 @@ public class MusicPlayer extends JFrame implements ActionListener
             }
             else if (e.getSource() == actButtons[CLOSE])
             {
-                //TODO: put this into a function
-                Display.setText("Ready");
-                SetAllButtonsEnabled(false);
-                actButtons[OPEN].setEnabled(true);
-                actButtons[EXIT].setEnabled(true);
-                state = states.READY;
+                DoClosed();
             }
             else if (e.getSource() == actButtons[EXIT])
             {
